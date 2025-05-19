@@ -3,6 +3,8 @@ package com.example.spring_mvc.repository;
 
 import com.example.spring_mvc.dto.ProductDTO;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,12 +19,12 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     Product findByName(String name);
 
     @Query("select p from Product p where p.isDeleted = false")
-    List<Product> findAll();
+    Page<Product> findAll(Pageable pageable);
 
     @Modifying
     @Transactional
     @Query("update Product p set p.name = ?1, p.description = ?2, p.price = ?3, p.category = ?4 where p.id = ?5")
-    void updateProduct(String name, String description, double price, String category);
+    void updateProduct(ProductDTO productDTO);
 
     @Modifying
     @Transactional

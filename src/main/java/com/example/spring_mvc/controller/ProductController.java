@@ -2,12 +2,14 @@ package com.example.spring_mvc.controller;
 
 
 import com.example.spring_mvc.dto.ProductDTO;
-import com.example.spring_mvc.exception.BadRequestException;
-import com.example.spring_mvc.exception.NoDataFoundException;
 import com.example.spring_mvc.model.Product;
 import com.example.spring_mvc.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,144 +25,37 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.findAll();
-        if (products.isEmpty()) {
-            throw new NoDataFoundException("Không có sản phẩm nào.");
-        }
+    public ResponseEntity<Page<Product>> getAllProducts(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sort", defaultValue = "name, asc") String[] sort) {
+        Sort.Direction direction = Sort.Direction.fromString(sort[1]);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort[0]));
+        Page<Product> products = productService.findAll(pageable);
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/{name}")
-    public ResponseEntity<Map<String, Object>> getProductByName(@PathVariable String name) {
-        try {
-            Product product = productService.findByName(name);
-            List<String> msg = new ArrayList<>();
-            msg.add("Get by name successful");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            response.put("product", product);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (NoSuchElementException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Get by name failed: NOT FOUND");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-
-        } catch (IllegalArgumentException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Get by name failed: BAD REQUEST");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-
-        } catch (HttpServerErrorException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Get by name failed: INTERNAL SERVER ERROR");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-
-        }
+    public ResponseEntity<Product> getProductByName(@PathVariable String name) {
+        Product product = productService.findByName(name);
+            return ResponseEntity.ok(product);
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Map<String, Object>> updateProduct(String name, String description, double price, String category) {
-        try {
-            productService.updateProduct(name, description, price, category);
-            List<String> msg = new ArrayList<>();
-            msg.add("Update successful");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (NoSuchElementException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Update failed: NOT FOUND");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-
-        } catch (IllegalArgumentException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Update failed: BAD REQUEST");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-
-        } catch (HttpServerErrorException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Update failed: INTERNAL SERVER ERROR");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-
-        }
+    public ResponseEntity<Void> updateProduct(@Valid @RequestBody ProductDTO productDTO) {
+        productService.updateProduct(productDTO);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/insert")
-    public ResponseEntity<Map<String, Object>> insertProduct(@Valid @RequestBody ProductDTO productDTO) {
-        try {
-            productService.insertProduct(productDTO);
-            List<String> msg = new ArrayList<>();
-            msg.add("Insert successful");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (NoSuchElementException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Insert failed: NOT FOUND");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-
-        } catch (IllegalArgumentException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Insert failed: BAD REQUEST");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-
-        } catch (HttpServerErrorException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Insert failed: INTERNAL SERVER ERROR");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-
-        }
+    public ResponseEntity<Void> insertProduct(@Valid @RequestBody ProductDTO productDTO) {
+        productService.insertProduct(productDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/delete/{id}")
-    public ResponseEntity<Map<String, Object>> deleteProduct(@PathVariable int id) {
-        try {
-            productService.softDelete(id);
-            List<String> msg = new ArrayList<>();
-            msg.add("Delete successful");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (NoSuchElementException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Delete failed: NOT FOUND");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-
-        } catch (IllegalArgumentException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Delete failed: BAD REQUEST");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-
-        } catch (HttpServerErrorException e) {
-            List<String> msg = new ArrayList<>();
-            msg.add("Delete failed: INTERNAL SERVER ERROR");
-            Map<String, Object> response = new HashMap<>();
-            response.put("messages", msg);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-
-        }
+    public ResponseEntity<Void> softDeleteProduct(@PathVariable int id) {
+        productService.softDelete(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -6,6 +6,8 @@ import com.example.spring_mvc.model.Product;
 import com.example.spring_mvc.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -17,22 +19,21 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    public List<Product> findAll() {
-        return productRepository.findAll();
+    public Page<Product> findAll(Pageable pageable) {
+        return productRepository.findAll(pageable);
     }
-
     public Product findByName(String name) {
         return productRepository.findByName(name);
     }
 
     @Transactional
-    public void updateProduct(String name, String description, double price, String category) {
-
-    Product product =productRepository.findByName(name);
+    public void updateProduct(@RequestBody ProductDTO productDTO) {
+        Product product = productRepository.findByName(productDTO.getName());
         if (product != null) {
-            product.setDescription(description);
-            product.setPrice(price);
-            product.setCategory(category);
+            product.setName(productDTO.getName());
+            product.setDescription(productDTO.getDescription());
+            product.setPrice(productDTO.getPrice());
+            product.setCategory(productDTO.getCategory());
             productRepository.save(product);
         }
     }
