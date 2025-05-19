@@ -4,6 +4,7 @@ package com.example.spring_mvc.controller;
 import com.example.spring_mvc.dto.ProductDTO;
 import com.example.spring_mvc.model.Product;
 import com.example.spring_mvc.service.ProductService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,7 @@ public class ProductController {
     public ResponseEntity<Page<Product>> getAllProducts(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            @RequestParam(value = "sort", defaultValue = "name, asc") String[] sort) {
+            @RequestParam(value = "sort", defaultValue = "id, asc") String[] sort) {
         Sort.Direction direction = Sort.Direction.fromString(sort[1]);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort[0]));
         Page<Product> products = productService.findAll(pageable);
@@ -41,12 +42,14 @@ public class ProductController {
             return ResponseEntity.ok(product);
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<Void> updateProduct(@Valid @RequestBody ProductDTO productDTO) {
-        productService.updateProduct(productDTO);
+    @Transactional
+    @PostMapping("/update/{name}")
+    public ResponseEntity<Void> updateProduct(@Valid @PathVariable String name, @RequestBody ProductDTO productDTO) {
+        productService.updateProduct(name, productDTO);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Transactional
     @PostMapping("/insert")
     public ResponseEntity<Void> insertProduct(@Valid @RequestBody ProductDTO productDTO) {
         productService.insertProduct(productDTO);

@@ -21,12 +21,11 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Query("select p from Product p where p.isDeleted = false")
     Page<Product> findAll(Pageable pageable);
 
-    @Modifying
-    @Transactional
-    @Query("update Product p set p.name = ?1, p.description = ?2, p.price = ?3, p.category = ?4 where p.id = ?5")
-    void updateProduct(ProductDTO productDTO);
 
-    @Modifying
+    @Transactional
+    @Query("update Product p set p.name = ?1, p.description = ?2, p.price = ?3, p.category = ?4 where p.name = ?5")
+    void updateProduct(String name, String newName, String description, double price, String category);
+
     @Transactional
     @Query("insert into Product (name, description, price, category) values (?1, ?2, ?3, ?4)")
     void insertProduct(ProductDTO productDTO);

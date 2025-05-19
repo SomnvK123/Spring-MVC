@@ -27,8 +27,8 @@ public class ProductService {
     }
 
     @Transactional
-    public void updateProduct(@RequestBody ProductDTO productDTO) {
-        Product product = productRepository.findByName(productDTO.getName());
+    public void updateProduct(String name, ProductDTO productDTO) {
+        Product product = productRepository.findByName(name);
         if (product != null) {
             product.setName(productDTO.getName());
             product.setDescription(productDTO.getDescription());
@@ -40,13 +40,13 @@ public class ProductService {
 
 
     @Transactional
-    public void insertProduct(@RequestBody ProductDTO productDTO) {
+    public void insertProduct(ProductDTO productDTO) {
         Product product = new Product();
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
         product.setCategory(productDTO.getCategory());
-        product.setDeleted(false); // Set deleted to false when inserting a new product
+        product.setDeleted(false);
         productRepository.save(product);
     }
 
