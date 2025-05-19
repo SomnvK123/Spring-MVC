@@ -6,6 +6,7 @@ import com.example.spring_mvc.exception.BadRequestException;
 import com.example.spring_mvc.exception.NoDataFoundException;
 import com.example.spring_mvc.model.Product;
 import com.example.spring_mvc.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -98,7 +99,7 @@ public class ProductController {
     }
 
     @PostMapping("/insert")
-    public ResponseEntity<Map<String, Object>> insertProduct(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<Map<String, Object>> insertProduct(@Valid @RequestBody ProductDTO productDTO) {
         try {
             productService.insertProduct(productDTO);
             List<String> msg = new ArrayList<>();

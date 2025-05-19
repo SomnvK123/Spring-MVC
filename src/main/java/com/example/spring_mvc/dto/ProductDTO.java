@@ -4,18 +4,19 @@ import jakarta.validation.constraints.*;
 
 public class ProductDTO {
 
-    @NotNull(message = "Tên sản phẩm không được để trống")
+    @NotNull(message = "Product name cannot be empty")
     private String name;
 
-    @NotNull(message = "Mô tả không được để trống")
-    @Max(value = 255, message = "Mô tả không được quá 255 ký tự")
+    @NotNull(message = "Description cannot be empty")
+    @Size(min = 10, message = "Description must be at least 10 characters")
+    @Size(max = 200, message = "Description cannot exceed 200 characters")
     private String description;
 
-    @NotNull(message = "Giá không được để trống")
-    @PositiveOrZero(message = "Giá không được âm")
+    @NotNull(message = "Price cannot be empty")
+    @PositiveOrZero(message = "Price cannot be negative")
     private Double price;
 
-    @NotNull(message = "Thể loại không được để trống")
+    @NotNull(message = "Category cannot be empty")
     private String category;
 
     public ProductDTO() {
