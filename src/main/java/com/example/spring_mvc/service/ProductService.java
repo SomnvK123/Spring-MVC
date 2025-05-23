@@ -41,13 +41,7 @@ public class ProductService {
 
     @Transactional
     public void insertProduct(ProductDTO productDTO) {
-        Product product = new Product();
-        product.setName(productDTO.getName());
-        product.setDescription(productDTO.getDescription());
-        product.setPrice(productDTO.getPrice());
-        product.setCategory(productDTO.getCategory());
-        product.setDeleted(false);
-        productRepository.save(product);
+        productRepository.insertProduct(productDTO.getName(), productDTO.getDescription(), productDTO.getPrice(), productDTO.getCategory(), productDTO.isDeleted());
     }
 
     public void softDelete(int id) {
@@ -56,5 +50,17 @@ public class ProductService {
             product.setDeleted(true);
             productRepository.save(product);
         }
+    }
+
+    @Transactional
+    public void batchInsertProducts(List<Product> products) {
+        for (Product product : products) {
+            product.setDeleted(false);
+        }
+        productRepository.saveAll(products);
+    }
+
+    public List<Product> filterByCategory(String category) {
+        return productRepository.filterByCategory(category);
     }
 }

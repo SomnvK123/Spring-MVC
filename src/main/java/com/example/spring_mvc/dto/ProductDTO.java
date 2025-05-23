@@ -1,24 +1,27 @@
 package com.example.spring_mvc.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.Value;
 
-public class ProductDTO {
+import java.io.Serializable;
+
+@Value
+public class ProductDTO implements Serializable {
 
     @NotNull(message = "Product name cannot be empty")
-    private String name;
+     String name;
 
     @NotNull(message = "Description cannot be empty")
-    private String description;
+     String description;
 
     @NotNull(message = "Price cannot be empty")
     @PositiveOrZero(message = "Price cannot be negative")
-    private Double price;
+     Double price;
 
     @NotNull(message = "Category cannot be empty")
-    private String category;
+     String category;
 
-    public ProductDTO() {
-    }
+    boolean deleted = false;
 
     public ProductDTO(String name, String description, Double price, String category) {
         this.name = name;
@@ -27,35 +30,22 @@ public class ProductDTO {
         this.category = category;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public String getName() {
+        return name;
     }
 
     public Double getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
     public String getCategory() {
         return category;
     }
-
-    public void setCategory(String category) {
-        this.category = category;
+    public boolean isDeleted() {
+        return deleted;
     }
 }

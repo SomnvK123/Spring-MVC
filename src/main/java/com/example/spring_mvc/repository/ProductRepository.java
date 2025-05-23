@@ -23,13 +23,26 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
 
     @Transactional
+    @Modifying
     @Query("update Product p set p.name = ?1, p.description = ?2, p.price = ?3, p.category = ?4 where p.name = ?5")
     void updateProduct(String name, String newName, String description, double price, String category);
 
     @Transactional
-    @Query("insert into Product (name, description, price, category) values (?1, ?2, ?3, ?4)")
-    void insertProduct(ProductDTO productDTO);
+    @Modifying
+    @Query("insert into Product (name, description, price, category, isDeleted) values (?1, ?2, ?3, ?4, ?5)")
+    void insertProduct(String name, String description, double price, String category, boolean isDeleted);
 
+    @Modifying
     @Query("update Product p set p.isDeleted = true where p.id = ?1")
     void softDelete(int id);
+
+
+    @Transactional
+    @Modifying
+    @Query("insert into Product (name, description, price, category) values (?1, ?2, ?3, ?4)")
+    void batchInsertProducts(List<Product> products);
+
+
+    @Query("select p from Product p where p.category = ?1")
+    List<Product> filterByCategory(String category);
 }

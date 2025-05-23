@@ -61,4 +61,17 @@ public class ProductController {
         productService.softDelete(id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @Transactional
+    @PostMapping("/batchInsert")
+    public ResponseEntity<Void> batchInsertProducts(@RequestBody List<Product> products) {
+        productService.batchInsertProducts(products);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/filter/{category}")
+    public ResponseEntity<List<Product>> filterByCategory(@PathVariable String category) {
+        productService.filterByCategory(category);
+        return ResponseEntity.ok(productService.filterByCategory(category));
+    }
 }
